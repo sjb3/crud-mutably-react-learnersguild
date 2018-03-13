@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import EditableRow from './EditableRow'
 
+const baseURL = 'http://mutably.herokuapp.com/books/';
+
 class App extends Component {
   constructor(props) {
     super(props)
@@ -10,7 +12,8 @@ class App extends Component {
       loading: true,
     }
 
-    this.updateRow = this.updateRow.bind(this)
+    this.updateElement = this.updateElement.bind(this)
+    this.deleteElement = this.deleteElement.bind(this)
   }
 
   componentDidMount() {
@@ -18,7 +21,7 @@ class App extends Component {
   }
 
   fetchAllElements() {
-    return fetch('http://mutably.herokuapp.com/books')
+    return fetch(baseURL)
       .then(response => response.json())
       .then((data) => {
         this.setState({
@@ -34,10 +37,10 @@ class App extends Component {
       })
   }
 
-  updateRow(book) {
+  updateElement(book) {
     const { _id, title, author, image } = book
 
-    return fetch(`http://mutably.herokuapp.com/books/${_id}`, {
+    return fetch(`${baseURL}${_id}`, {
       method: 'PUT',
       body: JSON.stringify({
         title: title,
@@ -47,6 +50,11 @@ class App extends Component {
       header: { 'Content-Type': 'application/json' },
 
     }).then(console.log)
+  }
+
+  deleteElement() {
+    return fetch()
+
   }
 
   render() {
@@ -74,7 +82,8 @@ class App extends Component {
                     author={book.author}
                     imageURL={book.image}
                     bookId={book._id}
-                    handleSave={this.updateRow}
+                    handleSave={this.updateElement}
+                    handleDelete={this.deleteElement}
                   />
                 </li>
               ))
