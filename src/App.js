@@ -1,72 +1,5 @@
 import React, { Component } from 'react'
-
-class EditableRow extends Component {
-  constructor(props){
-    super(props)
-
-    this.state = {
-      editable: false,
-      title: this.props.title,
-      author: this.props.author
-    }
-    this.toggleEditable = this.toggleEditable.bind(this)
-    this.handleInput = this.handleInput.bind(this)
-  }
-
-  toggleEditable() {
-    const { bookId } = this.props
-
-    if(this.state.editable) {
-      this.setState({ editable: false })
-      fetch(`http://mutably.herokuapp.com/books/${bookId}`, {
-        method: 'PUT',
-        body: JSON.stringify({
-          title: this.state.title,
-          author: this.state.author,
-          image: this.props.imageURL,
-        }),
-        header: { 'Content-Type': 'application/json' },
-
-      }).then(console.log())
-      return
-    }
-    this.setState({ editable: true })
-  }
-
-  handleInput(e) {
-    const name = e.target.name
-    console.log(name);
-
-    // this.setState([prevState, props] => {}) // formal way
-    this.setState({
-      [name]: e.target.value, // this works as well, new way?
-    })
-  }
-
-  render(){
-    const { imageURL } = this.props
-    const { editable, title, author } = this.state
-
-
-    return (
-      <div>
-        { editable ? (
-          <div>
-            <button className='btn btn-primary' onClick={this.toggleEditable}>Save</button>
-            <input name='title' placeholder='title: ' value={title} className='form-control' onChange={this.handleInput} />
-            <input name='author' placeholder='author: '  value={author} className='form-control' onChange={this.handleInput} />
-          </div>
-        ) : (
-          <div>
-            <button className='btn btn-success' onClick={this.toggleEditable}>Edit</button>
-            <span>{title}&nbsp; {author}</span>
-            <img src={imageURL} style={{height: '50px', width: '50px'}} />
-        </div>
-        )}
-      </div>
-      )
-    }
-}
+import EditableRow from './EditableRow'
 
 class App extends Component {
   constructor(props) {
@@ -74,16 +7,18 @@ class App extends Component {
 
     this.state = {
       books: [],
-      loading: false,
+      loading: true,
     }
+
+    this.updateRow = this.updateRow.bind(this)
   }
 
   componentDidMount() {
-    this.setState({
-      loading: true,
-    })
+    this.fetchAllElements()
+  }
 
-    fetch('http://mutably.herokuapp.com/books')
+  fetchAllElements() {
+    return fetch('http://mutably.herokuapp.com/books')
       .then(response => response.json())
       .then((data) => {
         this.setState({
@@ -97,6 +32,21 @@ class App extends Component {
           loading: false,
         })
       })
+  }
+
+  updateRow(book) {
+    const { _id, title, author, image } = book
+
+    return fetch(`http://mutably.herokuapp.com/books/${_id}`, {
+      method: 'PUT',
+      body: JSON.stringify({
+        title: title,
+        author: author,
+        image: image,
+      }),
+      header: { 'Content-Type': 'application/json' },
+
+    }).then(console.log)
   }
 
   render() {
@@ -124,6 +74,7 @@ class App extends Component {
                     author={book.author}
                     imageURL={book.image}
                     bookId={book._id}
+                    handleSave={this.updateRow}
                   />
                 </li>
               ))
