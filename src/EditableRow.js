@@ -45,7 +45,7 @@ export default class EditableRow extends Component {
   }
 
   render(){
-    const { imageURL } = this.props
+    const { imageURL, handleDelete } = this.props
     const { editable, title, author } = this.state
 
 
@@ -62,6 +62,7 @@ export default class EditableRow extends Component {
             <button className='btn btn-success' onClick={this.handleEditClick}>Edit</button>
             <span>{title}&nbsp; {author}</span>
             <img src={imageURL} style={{height: '50px', width: '50px'}} />
+            <button className='btn btn-danger' onClick={handleDelete}>Delete</button>
         </div>
         )}
       </div>
